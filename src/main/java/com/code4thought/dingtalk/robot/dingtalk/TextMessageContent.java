@@ -6,10 +6,10 @@ package com.code4thought.dingtalk.robot.dingtalk;
  * @author kangliqi
  * @date 2019/8/15
  */
-public class MessageContent {
+public class TextMessageContent {
     private String content;
 
-    public MessageContent(String content) {
+    public TextMessageContent(String content) {
         this.content = content;
     }
 

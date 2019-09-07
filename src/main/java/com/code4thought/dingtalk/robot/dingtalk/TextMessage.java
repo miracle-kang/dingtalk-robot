@@ -1,7 +1,6 @@
 package com.code4thought.dingtalk.robot.dingtalk;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Specified here
@@ -12,15 +11,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TextMessage implements IDingTalkMessage {
 
-    private MessageContent text;
+    private TextMessageContent text;
     private MessageAt at;
 
     public TextMessage(String message) {
-        this.text = new MessageContent(message);
+        this.text = new TextMessageContent(message);
     }
 
     public TextMessage(String message, MessageAt at) {
-        this.text = new MessageContent(message);
+        this.text = new TextMessageContent(message);
         this.at = at;
     }
 
@@ -29,7 +28,7 @@ public class TextMessage implements IDingTalkMessage {
         return "text";
     }
 
-    public MessageContent getText() {
+    public TextMessageContent getText() {
         return text;
     }
 

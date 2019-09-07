@@ -28,4 +28,14 @@ public class TranslateForm {
     public String getLinkToTweet() {
         return linkToTweet;
     }
+
+    @Override
+    public String toString() {
+        return "TranslateForm{" +
+                "username='" + username + '\'' +
+                ", createdAt='" + createdAt + '\'' +
+                ", text='" + text + '\'' +
+                ", linkToTweet='" + linkToTweet + '\'' +
+                '}';
+    }
 }
