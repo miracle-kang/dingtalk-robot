@@ -1,9 +1,11 @@
 package com.code4thought.dingtalk.robot.api;
 
-import com.code4thought.dingtalk.robot.api.form.TranslateForm;
+import com.code4thought.dingtalk.robot.api.form.MessageForm;
+import com.code4thought.dingtalk.robot.api.form.TweetForm;
 import com.code4thought.dingtalk.robot.dingtalk.DingTalkClient;
 import com.code4thought.dingtalk.robot.dingtalk.MarkdownMessage;
 import com.code4thought.dingtalk.robot.dingtalk.MessageAt;
+import com.code4thought.dingtalk.robot.dingtalk.TextMessage;
 import com.code4thought.dingtalk.robot.youdao.YouDaoApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,8 +29,8 @@ public class WebResources {
         this.youDaoApi = youDaoApi;
     }
 
-    @PostMapping("/translate/{token}")
-    public void translateAndSend(@PathVariable String token, @RequestBody TranslateForm form) {
+    @PostMapping("/dingTalk/{token}/tweetMessage")
+    public void newTweet(@PathVariable String token, @RequestBody TweetForm form) {
 
         logger.info("{} new tweeted: {}", form.getUsername(), form);
 
@@ -46,5 +48,38 @@ public class WebResources {
                 MessageAt.atAll()));
 
         logger.info("Send ding talk message result OK.");
+    }
+
+    @PostMapping("/dingTalk/{token}/message")
+    public void newMessage(@PathVariable String token, @RequestBody MessageForm form) {
+
+        logger.info("New message {}", form);
+
+        String translatedText = null;
+        if (form.getTranslate() != null && form.getTranslate()) {
+            translatedText = youDaoApi.translate(form.getText());
+        }
+
+        DingTalkClient dingTalkClient = new DingTalkClient(token);
+        MessageAt messageAt = form.getAtAll() != null && form.getAtAll() ? MessageAt.atAll() : null;
+        if (translatedText == null && (form.getTitle() == null || form.getTitle().isBlank())) {
+            dingTalkClient.sendTextMessage(new TextMessage(form.getText(), messageAt));
+            return;
+        }
+
+        String title = form.getTitle() == null || form.getTitle().isBlank() ? form.getText() : form.getTitle();
+        if (translatedText != null && !translatedText.isBlank()) {
+            dingTalkClient.sendMarkdownMessage(new MarkdownMessage(
+                    title,
+                    "#### " + form.getText() + "\n"
+                            + "##### 译文\n"
+                            + "#### " + translatedText,
+                    messageAt));
+        } else {
+            dingTalkClient.sendMarkdownMessage(new MarkdownMessage(
+                    title,
+                    form.getText(),
+                    messageAt));
+        }
     }
 }
