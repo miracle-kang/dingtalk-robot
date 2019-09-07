@@ -33,6 +33,10 @@ public class DingTalkClient {
         sendMessage(textMessage).validate();
     }
 
+    public void sendMarkdownMessage(MarkdownMessage markdownMessage) {
+        sendMessage(markdownMessage).validate();
+    }
+
     private DingTalkResponse sendMessage(IDingTalkMessage message) {
         try {
             HttpResponse<byte[]> response = httpClient
@@ -52,10 +56,5 @@ public class DingTalkClient {
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(data)))
                 .build();
-    }
-
-    public static void main(String[] args) {
-        DingTalkClient client = new DingTalkClient("7aa5db2a955bd3bf30017d586335d9975901e61d86f0e95ad7b6049a2de8f777");
-        client.sendTextMessage(new TextMessage("", MessageAt.atAll()));
     }
 }
