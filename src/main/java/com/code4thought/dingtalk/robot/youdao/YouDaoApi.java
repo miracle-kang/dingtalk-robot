@@ -44,7 +44,7 @@ public class YouDaoApi {
 
 
     public String translate(String text) {
-        return translate(text, "EN", "zh-CHS");
+        return translate(text, "auto", "auto");
     }
 
     public String translate(String text, String from, String to) {
@@ -113,5 +113,10 @@ public class YouDaoApi {
         }
 
         return builder.toString();
+    }
+
+    public static void main(String[] args) {
+        YouDaoApi api = new YouDaoApi("5bb5e8039660b5e4", "jdCSWyiPrfbkkCEPPXAvxtp6wvv5nc7w");
+        System.out.println(api.translate("Hello world!"));
     }
 }
