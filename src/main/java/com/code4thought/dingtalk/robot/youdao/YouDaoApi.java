@@ -106,7 +106,7 @@ public class YouDaoApi {
         StringBuilder builder = new StringBuilder();
         params.forEach((key, value) -> builder.append(key)
                 .append("=")
-                .append(URLEncoder.encode(value, StandardCharsets.UTF_8)).append("&"));
+                .append(URLEncoder.encode(value == null ? "" : value, StandardCharsets.UTF_8)).append("&"));
 
         if (builder.length() > 0) {
             return builder.substring(0, builder.length() - 1);
