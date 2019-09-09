@@ -27,4 +27,14 @@ public class MessageForm {
     public Boolean getAtAll() {
         return atAll;
     }
+
+    @Override
+    public String toString() {
+        return "MessageForm{" +
+                "title='" + title + '\'' +
+                ", text='" + text + '\'' +
+                ", translate=" + translate +
+                ", atAll=" + atAll +
+                '}';
+    }
 }
