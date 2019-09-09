@@ -7,9 +7,13 @@ import com.code4thought.dingtalk.robot.dingtalk.MarkdownMessage;
 import com.code4thought.dingtalk.robot.dingtalk.MessageAt;
 import com.code4thought.dingtalk.robot.dingtalk.TextMessage;
 import com.code4thought.dingtalk.robot.youdao.YouDaoApi;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 /**
  * Specified here
@@ -24,13 +28,21 @@ public class WebResources {
     public static Logger logger = LoggerFactory.getLogger(WebResources.class);
 
     private final YouDaoApi youDaoApi;
+    private final ObjectMapper objectMapper;
 
     public WebResources(YouDaoApi youDaoApi) {
         this.youDaoApi = youDaoApi;
+        this.objectMapper = new ObjectMapper();
     }
 
-    @PostMapping("/dingTalk/{token}/tweetMessage")
-    public void newTweet(@PathVariable String token, @RequestBody TweetForm form) {
+    @PostMapping(
+            value = "/dingTalk/{token}/tweetMessage",
+            consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public void newTweet(@PathVariable String token, @RequestParam Map<String, String> params) {
+
+        TweetForm form = objectMapper.convertValue(params, TweetForm.class);
 
         logger.info("{} new tweeted: {}", form.getUsername(), form);
 
@@ -50,8 +62,14 @@ public class WebResources {
         logger.info("Send ding talk message result OK.");
     }
 
-    @PostMapping("/dingTalk/{token}/message")
-    public void newMessage(@PathVariable String token, @RequestBody MessageForm form) {
+    @PostMapping(
+            value = "/dingTalk/{token}/message",
+            consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public void newMessage(@PathVariable String token, @RequestParam Map<String, String> params) {
+
+        MessageForm form = objectMapper.convertValue(params, MessageForm.class);
 
         logger.info("New message {}", form);
 
