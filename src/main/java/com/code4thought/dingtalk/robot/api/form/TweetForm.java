@@ -18,6 +18,13 @@ public class TweetForm {
     @NotBlank(message = "Text must not be null.")
     private String text;
 
+    public TweetForm(String username, String createdAt, String linkToTweet, @NotBlank(message = "Text must not be null.") String text) {
+        this.username = username;
+        this.createdAt = createdAt;
+        this.linkToTweet = linkToTweet;
+        this.text = text;
+    }
+
     public String getUsername() {
         return username;
     }

@@ -35,15 +35,15 @@ public class WebResources {
         this.objectMapper = new ObjectMapper();
     }
 
-    @PostMapping(
-            value = "/dingTalk/{token}/tweetMessage",
-            consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    public void newTweet(@PathVariable String token, @RequestParam Map<String, String> params) {
+    @PostMapping("/dingTalk/{token}/tweetMessage")
+    public void newTweet(@PathVariable String token, @RequestBody String strParam) {
 
-        TweetForm form = objectMapper.convertValue(params, TweetForm.class);
-
+        String[] params = strParam.split(";;;");
+        if (params.length != 4) {
+            logger.error("Unknown params: {}", strParam);
+            return;
+        }
+        TweetForm form = new TweetForm(params[0], params[1], params[2], params[3]);
         logger.info("{} new tweeted: {}", form.getUsername(), form);
 
         String translatedText = youDaoApi.translate(form.getText());
@@ -62,14 +62,8 @@ public class WebResources {
         logger.info("Send ding talk message result OK.");
     }
 
-    @PostMapping(
-            value = "/dingTalk/{token}/message",
-            consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    public void newMessage(@PathVariable String token, @RequestParam Map<String, String> params) {
-
-        MessageForm form = objectMapper.convertValue(params, MessageForm.class);
+    @PostMapping("/dingTalk/{token}/message")
+    public void newMessage(@PathVariable String token, @RequestBody MessageForm form) {
 
         logger.info("New message {}", form);
 
