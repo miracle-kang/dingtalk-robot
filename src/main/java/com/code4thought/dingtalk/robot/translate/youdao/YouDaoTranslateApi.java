@@ -1,22 +1,23 @@
-package com.code4thought.dingtalk.robot.youdao;
+package com.code4thought.dingtalk.robot.translate.youdao;
 
+import com.code4thought.dingtalk.robot.translate.TranslateApi;
 import com.code4thought.dingtalk.robot.utils.Utils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Specified here
@@ -25,7 +26,11 @@ import java.util.UUID;
  * @date 2019/8/31
  */
 @Component
-public class YouDaoApi {
+@ConditionalOnProperty(
+        value = "translate.enable",
+        havingValue = "youdao"
+)
+public class YouDaoTranslateApi implements TranslateApi {
 
     private static final String API_URL = "https://openapi.youdao.com/api";
     private static final ObjectMapper objectMapper = new ObjectMapper();
@@ -35,18 +40,19 @@ public class YouDaoApi {
 
     private final HttpClient httpClient;
 
-    public YouDaoApi(@Value("${youdao.twitter-bot.appid}") String appid,
-                     @Value("${youdao.twitter-bot.secretKey}") String secretKey) {
+    public YouDaoTranslateApi(@Value("${translate.youdao.appid}") String appid,
+                              @Value("${translate.youdao.secretKey}") String secretKey) {
         this.appid = appid;
         this.secretKey = secretKey;
         this.httpClient = HttpClient.newHttpClient();
     }
 
-
+    @Override
     public String translate(String text) {
         return translate(text, "auto", "auto");
     }
 
+    @Override
     public String translate(String text, String from, String to) {
 
         Map<String, String> params = new HashMap<>();
@@ -66,10 +72,17 @@ public class YouDaoApi {
         String signStr = appid + truncate(text) + salt + curtime + secretKey;
         params.put("sign", Utils.SHA256(signStr));
 
-        try {
-            return request(params);
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+        for (int i = 0; i < 3; i++) {
+            try {
+                return request(params);
+            } catch (Exception e) {
+                e.printStackTrace();
+                try {
+                    TimeUnit.SECONDS.sleep(1);
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }
+            }
         }
         return "";
     }
@@ -78,7 +91,7 @@ public class YouDaoApi {
         HttpRequest request = HttpRequest.newBuilder(URI.create(API_URL))
                 .timeout(Duration.ofSeconds(30))
                 .header("Content-Type", "application/x-www-form-urlencoded")
-                .POST(HttpRequest.BodyPublishers.ofString(paramToUrlEncoded(data)))
+                .POST(HttpRequest.BodyPublishers.ofString(Utils.paramToUrlEncoded(data)))
                 .build();
 
         HttpResponse<byte[]> response = httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray());
@@ -99,24 +112,5 @@ public class YouDaoApi {
         int len = q.length();
         String result;
         return len <= 20 ? q : (q.substring(0, 10) + len + q.substring(len - 10, len));
-    }
-
-    private String paramToUrlEncoded(Map<String, String> params) {
-
-        StringBuilder builder = new StringBuilder();
-        params.forEach((key, value) -> builder.append(key)
-                .append("=")
-                .append(URLEncoder.encode(value == null ? "" : value, StandardCharsets.UTF_8)).append("&"));
-
-        if (builder.length() > 0) {
-            return builder.substring(0, builder.length() - 1);
-        }
-
-        return builder.toString();
-    }
-
-    public static void main(String[] args) {
-        YouDaoApi api = new YouDaoApi("5bb5e8039660b5e4", "jdCSWyiPrfbkkCEPPXAvxtp6wvv5nc7w");
-        System.out.println(api.translate("Hello world!"));
     }
 }
