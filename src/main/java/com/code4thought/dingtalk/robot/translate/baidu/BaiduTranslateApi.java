@@ -96,6 +96,11 @@ public class BaiduTranslateApi implements TranslateApi {
         if (transResult == null) {
             throw new RuntimeException("翻译失败，无翻译结果");
         }
-        return transResult.get(0).get("dst").textValue();
+
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < transResult.size(); i++) {
+            builder.append(transResult.get(i).get("dst").textValue()).append("\n");
+        }
+        return builder.substring(0, builder.length() - 1);
     }
 }
