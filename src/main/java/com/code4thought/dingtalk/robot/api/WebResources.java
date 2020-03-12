@@ -6,14 +6,12 @@ import com.code4thought.dingtalk.robot.dingtalk.DingTalkClient;
 import com.code4thought.dingtalk.robot.dingtalk.MarkdownMessage;
 import com.code4thought.dingtalk.robot.dingtalk.MessageAt;
 import com.code4thought.dingtalk.robot.dingtalk.TextMessage;
-import com.code4thought.dingtalk.robot.youdao.YouDaoApi;
+import com.code4thought.dingtalk.robot.translate.TranslateApi;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.MediaType;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 /**
  * Specified here
@@ -27,11 +25,11 @@ public class WebResources {
 
     public static Logger logger = LoggerFactory.getLogger(WebResources.class);
 
-    private final YouDaoApi youDaoApi;
+    private final TranslateApi translateApi;
     private final ObjectMapper objectMapper;
 
-    public WebResources(YouDaoApi youDaoApi) {
-        this.youDaoApi = youDaoApi;
+    public WebResources(TranslateApi translateApi) {
+        this.translateApi = translateApi;
         this.objectMapper = new ObjectMapper();
     }
 
@@ -46,7 +44,7 @@ public class WebResources {
         TweetForm form = new TweetForm(params[0], params[1], params[2], params[3]);
         logger.info("{} new tweeted: {}", form.getUsername(), form);
 
-        String translatedText = youDaoApi.translate(form.getText());
+        String translatedText = translateApi.translate(form.getText());
         logger.info("Translated Text: {}", translatedText);
 
         DingTalkClient dingTalkClient = new DingTalkClient(token);
@@ -54,7 +52,7 @@ public class WebResources {
                 "@" + form.getUsername() + " tweeted",
                 "#### " + form.getText() + "\n"
                         + "##### 译文\n"
-                        + "#### " + translatedText + "\n"
+                        + "#### " + (StringUtils.isEmpty(translatedText) ? "翻译失败" : translatedText) + "\n"
                         + "##### [原文链接](" + form.getLinkToTweet() + ")\n"
                         + "###### " + form.getCreatedAt(),
                 MessageAt.atAll()));
@@ -69,7 +67,8 @@ public class WebResources {
 
         String translatedText = null;
         if (form.getTranslate() != null && form.getTranslate()) {
-            translatedText = youDaoApi.translate(form.getText());
+            translatedText = translateApi.translate(form.getText());
+            logger.info("Translated Text: {}", translatedText);
         }
 
         DingTalkClient dingTalkClient = new DingTalkClient(token);
