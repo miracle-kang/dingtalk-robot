@@ -82,9 +82,9 @@ public class WebResources {
         if (translatedText != null && !translatedText.isBlank()) {
             dingTalkClient.sendMarkdownMessage(new MarkdownMessage(
                     title,
-                    form.getText() + "\n"
+                    "#### " + form.getText() + "\n"
                             + "##### 译文\n"
-                            + translatedText,
+                            + "#### " + translatedText,
                     messageAt));
         } else {
             dingTalkClient.sendMarkdownMessage(new MarkdownMessage(
