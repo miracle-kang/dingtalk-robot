@@ -1,0 +1,18 @@
+version: "3.6"
+
+services:
+  dingtalk-robot:
+    image: miraclekang/dingtalk-robot:latest
+    build:
+      dockerfile: Dockerfile
+      context: .
+    restart: always
+    ports:
+      - "127.0.0.1:18080:8080"
+    command:
+      - '--translate.enable=baidu'
+      - '--translate.baidu.appid=xxx'
+      - '--translate.baidu.secretKey=xxx'
+      - '--dingtalk.robot.secret.realDonaldTrump=xxx'
+      - '--dingtalk.robot.secret.JoeBiden=xxx'
+      - '--dingtalk.robot.secret.kangliqi=xxx'

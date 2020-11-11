@@ -7,6 +7,7 @@ import com.code4thought.dingtalk.robot.dingtalk.MarkdownMessage;
 import com.code4thought.dingtalk.robot.dingtalk.MessageAt;
 import com.code4thought.dingtalk.robot.dingtalk.TextMessage;
 import com.code4thought.dingtalk.robot.translate.TranslateApi;
+import com.code4thought.dingtalk.robot.utils.ApplicationConfigHelper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +48,7 @@ public class WebResources {
         String translatedText = translateApi.translate(form.getText());
         logger.info("Translated Text: {}", translatedText);
 
-        DingTalkClient dingTalkClient = new DingTalkClient(token);
+        DingTalkClient dingTalkClient = new DingTalkClient(token, getSecret(form.getUsername()));
         dingTalkClient.sendMarkdownMessage(new MarkdownMessage(
                 "@" + form.getUsername() + " tweeted",
                 "#### " + form.getText() + "\n"
@@ -55,7 +56,7 @@ public class WebResources {
                         + "#### " + (StringUtils.isEmpty(translatedText) ? "翻译失败" : translatedText) + "\n"
                         + "##### [原文链接](" + form.getLinkToTweet() + ")\n"
                         + "###### " + form.getCreatedAt(),
-                MessageAt.atAll()));
+                null));
 
         logger.info("Send ding talk message result OK.");
     }
@@ -71,7 +72,7 @@ public class WebResources {
             logger.info("Translated Text: {}", translatedText);
         }
 
-        DingTalkClient dingTalkClient = new DingTalkClient(token);
+        DingTalkClient dingTalkClient = new DingTalkClient(token, getSecret(form.getAccount()));
         MessageAt messageAt = form.getAtAll() != null && form.getAtAll() ? MessageAt.atAll() : null;
         if (translatedText == null && (form.getTitle() == null || form.getTitle().isBlank())) {
             dingTalkClient.sendTextMessage(new TextMessage(form.getText(), messageAt));
@@ -92,5 +93,16 @@ public class WebResources {
                     form.getText(),
                     messageAt));
         }
+    }
+
+    private String getSecret(String username) {
+        if (username == null || username.isBlank()) {
+            return null;
+        }
+        String secret = ApplicationConfigHelper.getConfig("dingtalk.robot.secret." + username);
+        if (secret == null || secret.isBlank()) {
+            return null;
+        }
+        return secret;
     }
 }

@@ -4,6 +4,8 @@ import javax.validation.constraints.NotBlank;
 
 public class MessageForm {
 
+    private String account;
+
     private String title;
 
     @NotBlank(message = "Text must not be null.")
@@ -11,6 +13,10 @@ public class MessageForm {
 
     private Boolean translate;
     private Boolean atAll;
+
+    public String getAccount() {
+        return account;
+    }
 
     public String getTitle() {
         return title;
