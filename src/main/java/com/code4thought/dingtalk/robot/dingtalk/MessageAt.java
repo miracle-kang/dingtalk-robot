@@ -33,11 +33,15 @@ public class MessageAt {
         return atAll;
     }
 
+    public static MessageAt noAt() {
+        return new MessageAt(null, false);
+    }
+
     public static MessageAt atAll() {
         return new MessageAt(null, true);
     }
 
-    public static MessageAt at(String ... atMobiles) {
+    public static MessageAt at(String... atMobiles) {
         return new MessageAt(Arrays.asList(atMobiles), false);
     }
 }
