@@ -13,6 +13,8 @@ services:
       - '--translate.enable=baidu'
       - '--translate.baidu.appid=xxx'
       - '--translate.baidu.secretKey=xxx'
+      - '--translate.youdao.appid=xxx'
+      - '--translate.youdao.secretKey=xxx'
       - '--dingtalk.robot.secret.realDonaldTrump=xxx'
       - '--dingtalk.robot.secret.JoeBiden=xxx'
       - '--dingtalk.robot.secret.kangliqi=xxx'
