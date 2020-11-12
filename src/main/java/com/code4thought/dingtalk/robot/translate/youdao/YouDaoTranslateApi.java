@@ -61,18 +61,18 @@ public class YouDaoTranslateApi implements TranslateApi {
         params.put("q", text);
         params.put("appKey", appid);
 
-        String salt = UUID.randomUUID().toString();
-        params.put("salt", salt);
-        params.put("signType", "v3");
-
-        String curtime = String.valueOf(System.currentTimeMillis() / 1000);
-        params.put("curtime", curtime);
-        params.put("secureKey", secretKey);
-
-        String signStr = appid + truncate(text) + salt + curtime + secretKey;
-        params.put("sign", Utils.SHA256(signStr));
-
         for (int i = 0; i < 3; i++) {
+            String salt = UUID.randomUUID().toString();
+            params.put("salt", salt);
+            params.put("signType", "v3");
+
+            String curtime = String.valueOf(System.currentTimeMillis() / 1000);
+            params.put("curtime", curtime);
+            params.put("secureKey", secretKey);
+
+            String signStr = appid + truncate(text) + salt + curtime + secretKey;
+            params.put("sign", Utils.SHA256(signStr));
+
             try {
                 return request(params);
             } catch (Exception e) {
@@ -99,7 +99,7 @@ public class YouDaoTranslateApi implements TranslateApi {
 
         String resultCode = resultNode.get("errorCode").textValue();
         if (resultCode == null || !resultCode.equals("0")) {
-            throw new RuntimeException("翻译失败！");
+            throw new RuntimeException("翻译失败: " + resultCode);
         }
 
         return resultNode.get("translation").get(0).textValue();

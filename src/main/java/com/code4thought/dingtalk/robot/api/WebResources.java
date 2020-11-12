@@ -27,11 +27,9 @@ public class WebResources {
     public static Logger logger = LoggerFactory.getLogger(WebResources.class);
 
     private final TranslateApi translateApi;
-    private final ObjectMapper objectMapper;
 
     public WebResources(TranslateApi translateApi) {
         this.translateApi = translateApi;
-        this.objectMapper = new ObjectMapper();
     }
 
     @PostMapping("/dingTalk/{token}/tweetMessage")

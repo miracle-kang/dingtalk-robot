@@ -56,13 +56,13 @@ public class BaiduTranslateApi implements TranslateApi {
         params.put("to", to);
         params.put("appid", appId);
 
-        String salt = RandomStringUtils.randomNumeric(10);
-        params.put("salt", salt);
-
-        String signStr = appId + text + salt + secretKey;
-        params.put("sign", Utils.md5(signStr));
-
         for (int i = 0; i < 3; i++) {
+            String salt = RandomStringUtils.randomNumeric(10);
+            params.put("salt", salt);
+
+            String signStr = appId + text + salt + secretKey;
+            params.put("sign", Utils.md5(signStr));
+
             try {
                 return request(params);
             } catch (Exception e) {
